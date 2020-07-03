@@ -1,7 +1,8 @@
-import React, {Component} from 'react';
+import React, {Component, PureComponent} from 'react';
 import './App.scss';
-import MapGL, {NavigationControl} from 'react-map-gl';
+import ReactMapGL, {NavigationControl, Marker} from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css'
+import pin from './images/logosmall.png';
 
 const mapbox_token = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
@@ -11,6 +12,24 @@ const navControlStyle = {
   right: 0,
   padding: '10px'
 };
+
+const markets = [
+  {id: 1, latitude: 37.0902, longitude: -95.7129},
+  {id: 2, latitude: 37.1024, longitude: -95.9129},
+]
+
+class Markers extends PureComponent {
+  render() {
+    return this.props.markets.map(market => 
+      <Marker 
+        key={market.id} 
+        latitude={market.latitude} 
+        longitude={market.longitude}>
+        <img src={pin} />
+      </Marker>
+    )
+  }
+}
 
 class Map extends Component {
   constructor(props) {
@@ -41,7 +60,7 @@ class Map extends Component {
   render() {
     let {viewport} = this.state;
     return (
-      <MapGL
+      <ReactMapGL
         {...viewport}
         mapboxApiAccessToken={mapbox_token}
         width = '100vw'
@@ -49,10 +68,11 @@ class Map extends Component {
         mapStyle="mapbox://styles/mapbox/streets-v11"
         onViewportChange={viewport => this.setState({viewport})}
         >
+        <Markers markets={markets} />
         <div className="nav" style={navControlStyle}>
           <NavigationControl/>
         </div>
-      </MapGL>
+      </ReactMapGL>
     );
   }  
 }
