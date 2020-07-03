@@ -3,6 +3,7 @@ import './App.scss';
 import ReactMapGL, {NavigationControl, Marker} from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css'
 import pin from './images/logosmall.png';
+const axios = require('axios');
 
 const mapbox_token = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
@@ -13,19 +14,28 @@ const navControlStyle = {
   padding: '10px'
 };
 
-const markets = [
-  {id: 1, latitude: 37.0902, longitude: -95.7129},
-  {id: 2, latitude: 37.1024, longitude: -95.9129},
-]
+async function getMarkets(lat, long) {
+  let response = await axios.get('https://search.ams.usda.gov/farmersmarkets/v1/data.svc/locSearch?lat='+lat+'&lng='+long, {})
+    .then((response) => {
+    console.log(response.status);
+    console.log(response.data);
+    return response;
+  }, (error) => {
+    console.log(error);
+  });
+  console.log(response.data.results)
+  return response.data.results //JSONArray
+}
 
 class Markers extends PureComponent {
   render() {
     return this.props.markets.map(market => 
       <Marker 
         key={market.id} 
-        latitude={market.latitude} 
-        longitude={market.longitude}>
+        latitude={42.3318} 
+        longitude={-71.1212}>
         <img src={pin} />
+        <div>{market.marketname}</div>
       </Marker>
     )
   }
@@ -36,22 +46,27 @@ class Map extends Component {
     super(props);
     this.state = {
       viewport: {
-        latitude: 37.0902,
-        longitude: -95.7129,
+        latitude: null,
+        longitude: null,
         zoom: 14,
         bearing: 0,
         pitch: 0,
-      }
+      },
+      markets: null
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     navigator.geolocation.getCurrentPosition(
-      position => {
+      async position => {
         let viewport = {...this.state.viewport};
         viewport.latitude = position.coords.latitude;
         viewport.longitude = position.coords.longitude;
-        this.setState({viewport})
+        this.setState({viewport});
+
+        //load markets here
+        let marketList = await getMarkets(position.coords.latitude, position.coords.longitude);
+        this.setState({markets: marketList});
       }, 
       err => console.log(err)
     );
@@ -59,6 +74,9 @@ class Map extends Component {
 
   render() {
     let {viewport} = this.state;
+    if (!viewport.latitude || !viewport.longitude || !this.state.markets) {
+      return <div>Loading...</div> //TODO replace with loading screen
+    }
     return (
       <ReactMapGL
         {...viewport}
@@ -68,7 +86,7 @@ class Map extends Component {
         mapStyle="mapbox://styles/mapbox/streets-v11"
         onViewportChange={viewport => this.setState({viewport})}
         >
-        <Markers markets={markets} />
+        <Markers markets={this.state.markets} />
         <div className="nav" style={navControlStyle}>
           <NavigationControl/>
         </div>
