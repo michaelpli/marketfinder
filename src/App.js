@@ -17,8 +17,8 @@ class Map extends Component {
     super(props);
     this.state = {
       viewport: {
-        latitude: 42.3601,
-        longitude: -71.0589,
+        latitude: 37.0902,
+        longitude: -95.7129,
         zoom: 14,
         bearing: 0,
         pitch: 0,
@@ -26,8 +26,20 @@ class Map extends Component {
     };
   }
 
+  componentDidMount() {
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        let viewport = {...this.state.viewport};
+        viewport.latitude = position.coords.latitude;
+        viewport.longitude = position.coords.longitude;
+        this.setState({viewport})
+      }, 
+      err => console.log(err)
+    );
+  }
+
   render() {
-    const {viewport} = this.state;
+    let {viewport} = this.state;
     return (
       <MapGL
         {...viewport}
