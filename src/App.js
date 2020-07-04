@@ -2,7 +2,7 @@ import React, {Component, PureComponent} from 'react';
 import './App.scss';
 import ReactMapGL, {NavigationControl, Marker} from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css'
-import pin from './images/logosmall.png';
+import pin from './images/organic.png';
 
 const axios = require('axios');
 const mapbox_token = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
@@ -64,7 +64,6 @@ class myMarker extends PureComponent{
       </Marker>
     );
   }
-  
 }
 
 class Markers extends PureComponent {
