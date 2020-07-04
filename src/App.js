@@ -3,10 +3,9 @@ import './App.scss';
 import ReactMapGL, {NavigationControl, Marker} from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css'
 import pin from './images/logosmall.png';
+
 const axios = require('axios');
-
 const mapbox_token = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
-
 const navControlStyle = {
   position: 'absolute',
   bottom: 20,
@@ -18,25 +17,71 @@ async function getMarkets(lat, long) {
   let response = await axios.get('https://search.ams.usda.gov/farmersmarkets/v1/data.svc/locSearch?lat='+lat+'&lng='+long, {})
     .then((response) => {
     console.log(response.status);
-    console.log(response.data);
+    //console.log(response.data);
     return response;
   }, (error) => {
     console.log(error);
   });
-  console.log(response.data.results)
+  //console.log(response.data.results)
   return response.data.results //JSONArray
+}
+
+async function getMarketDetails(id) {
+  let response = await axios.get('https://search.ams.usda.gov/farmersmarkets/v1/data.svc/mktDetail?id='+id, {})
+    .then((response) => {
+    console.log(response.status);
+    //console.log(response.data);
+    return response;
+  }, (error) => {
+    console.log(error);
+  });
+  //console.log(response.data.marketdetails)
+  return response.data.marketdetails //JSONObject
+}
+
+//example link: 'http://maps.google.com/?q=42.066418%2C%20-87.937294%20(%22Mt.+Prospect+Farmers+Market%22)'
+function parseGMapsLink(GMapsLink) {
+  let tempBoth = GMapsLink.split('%2C%20');
+  let tempLat = tempBoth[0].split('=');
+  let lat = parseFloat(tempLat[1]);
+  let tempLong = tempBoth[1].split('%20');
+  let long = parseFloat(tempLong[0]);
+  return {lat: lat, long: long};
+}
+
+class myMarker extends PureComponent{
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    let marketDetails = this.props.marketDetails;
+    return (
+      <Marker 
+        
+      >
+
+      </Marker>
+    );
+  }
+  
 }
 
 class Markers extends PureComponent {
   render() {
-    return this.props.markets.map(market => 
-      <Marker 
-        key={market.id} 
-        latitude={42.3318} 
-        longitude={-71.1212}>
-        <img src={pin} />
-        <div>{market.marketname}</div>
-      </Marker>
+    return this.props.markets.map(market => {
+        let GMapsLink = market.marketDetails.GoogleLink;
+        let coords = parseGMapsLink(GMapsLink);
+        return (
+        <Marker 
+          key={market.id} 
+          latitude={coords.lat} 
+          longitude={coords.long}>
+          <img src={pin} />
+          <div>{market.marketname}</div>
+        </Marker>
+        )
+      }
     )
   }
 }
@@ -64,10 +109,19 @@ class Map extends Component {
         viewport.longitude = position.coords.longitude;
         this.setState({viewport});
 
-        //load markets here
+        //load markets
         let marketList = await getMarkets(position.coords.latitude, position.coords.longitude);
-        this.setState({markets: marketList});
-      }, 
+        //get details
+        let newList = [];
+        for (const market of marketList) {
+          let marketDetails = await getMarketDetails(market.id);
+          market.marketDetails = marketDetails;
+          newList.push(market);
+        }
+        console.log('detailMarketList:')
+        console.log(newList)
+        this.setState({markets: newList});
+      },
       err => console.log(err)
     );
   }
