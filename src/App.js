@@ -1,8 +1,10 @@
 import React, {Component, PureComponent} from 'react';
 import './App.scss';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import ReactMapGL, {NavigationControl, Marker} from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css'
 import pin from './images/organic.png';
+import Button from 'react-bootstrap/Button';
 
 const axios = require('axios');
 const mapbox_token = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
@@ -78,6 +80,7 @@ class Markers extends PureComponent {
           longitude={coords.long}>
           <img src={pin} />
           <div>{market.marketname}</div>
+          <div><Button>Hello</Button></div>
         </Marker>
         )
       }
