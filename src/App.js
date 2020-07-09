@@ -1,7 +1,15 @@
 import React, {Component, PureComponent} from 'react';
 import './App.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import ReactMapGL, {NavigationControl, Marker} from 'react-map-gl';
+//import ReactMapGL, {NavigationControl, Marker} from 'react-map-gl';
+import MapGL, {
+  Popup,
+  NavigationControl,
+  FullscreenControl,
+  ScaleControl,
+  GeolocateControl,
+  Marker
+} from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css'
 import pin from './images/organic.png';
 import Button from 'react-bootstrap/Button';
@@ -51,19 +59,36 @@ function parseGMapsLink(GMapsLink) {
   return {lat: lat, long: long};
 }
 
-class myMarker extends PureComponent{
+class MyMarker extends PureComponent{
+
   constructor(props) {
     super(props);
   }
 
   render() {
-    let marketDetails = this.props.marketDetails;
+    let market = this.props.market;
+    let GMapsLink = market.marketDetails.GoogleLink;
+    let coords = parseGMapsLink(GMapsLink);
+    market = {...market, coords: coords};
+    const SIZE = 30;
     return (
-      <Marker 
-        
-      >
-
-      </Marker>
+        <Marker
+          key={market.id} 
+          latitude={coords.lat} 
+          longitude={coords.long}>
+            <img 
+            height={SIZE}
+            viewBox="0 0 24 24"
+            src={pin} 
+            style={{
+              cursor: 'pointer',
+              fill: '#d00',
+              stroke: 'none',
+              transform: `translate(${-SIZE / 2}px,${-SIZE}px)`
+            }}
+            onMouseEnter={() => this.props.onClick(market)}> 
+            </img>
+        </Marker>
     );
   }
 }
@@ -71,17 +96,8 @@ class myMarker extends PureComponent{
 class Markers extends PureComponent {
   render() {
     return this.props.markets.map(market => {
-        let GMapsLink = market.marketDetails.GoogleLink;
-        let coords = parseGMapsLink(GMapsLink);
         return (
-        <Marker 
-          key={market.id} 
-          latitude={coords.lat} 
-          longitude={coords.long}>
-          <img src={pin} />
-          <div>{market.marketname}</div>
-          <div><Button>Hello</Button></div>
-        </Marker>
+          <MyMarker market = {market} key = {market.id} onClick = {this.props.onClick}/>
         )
       }
     )
@@ -99,8 +115,34 @@ class Map extends Component {
         bearing: 0,
         pitch: 0,
       },
-      markets: null
+      markets: null,
+      popupInfo: null
     };
+    this._onClickMarker = this._onClickMarker.bind(this)
+    this._renderPopup = this._renderPopup.bind(this)
+  }
+
+  _onClickMarker = market => {
+    this.setState({popupInfo: market});
+  };
+
+  _renderPopup() {
+    const {popupInfo} = this.state;
+    return (
+      popupInfo && (
+        <Popup
+          tipSize={5}
+          anchor="top"
+          longitude={popupInfo.coords.long}
+          latitude={popupInfo.coords.lat}
+          closeOnClick={false}
+          onClose={() => this.setState({popupInfo: null})}
+        >
+          Fill popup info here
+          {/* <CityInfo info={popupInfo} /> */}
+        </Popup>
+      )
+    );
   }
 
   async componentDidMount() {
@@ -134,7 +176,7 @@ class Map extends Component {
       return <div>Loading...</div> //TODO replace with loading screen
     }
     return (
-      <ReactMapGL
+      <MapGL
         {...viewport}
         mapboxApiAccessToken={mapbox_token}
         width = '100vw'
@@ -142,18 +184,19 @@ class Map extends Component {
         mapStyle="mapbox://styles/mapbox/streets-v11"
         onViewportChange={viewport => this.setState({viewport})}
         >
-        <Markers markets={this.state.markets} />
+        <Markers markets={this.state.markets} onClick={this._onClickMarker}/>
+        {this._renderPopup()}
         <div className="nav" style={navControlStyle}>
           <NavigationControl/>
         </div>
-      </ReactMapGL>
+      </MapGL>
     );
   }  
 }
 
 function App() {
   return (
-    <Map/>
+    <Map/> 
   );
 }
 
