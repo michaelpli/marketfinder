@@ -12,7 +12,7 @@ import MapGL, {
 } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css'
 import pin from './images/organic.png';
-import Button from 'react-bootstrap/Button';
+import Card from 'react-bootstrap/Card';
 
 const axios = require('axios');
 const mapbox_token = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
@@ -59,10 +59,64 @@ function parseGMapsLink(GMapsLink) {
   return {lat: lat, long: long};
 }
 
+class MarkerInfo extends PureComponent{
+
+  render() {
+    const market = this.props.market;
+    const name = market.marketname.slice(4)
+    const dist = market.marketname.slice(0, 3)
+    const address = market.marketDetails.Address
+    const streetAddress = address.slice(0, address.indexOf(','))
+    const restAddress = address.slice(address.indexOf(','), address.length - 7)
+    const products = market.marketDetails.Products
+    const googleLink = market.marketDetails.GoogleLink
+    
+    // return(
+    //   <div className="MarkerInfo">
+    //     <div>
+    //       {name}
+    //     </div>
+    //     <div>
+    //       <a style = {{color: "skyblue"}} target="_new" href={googleLink} >
+    //         {streetAddress} 
+    //       </a>
+    //         {restAddress} {/*({dist} miles away)*/}
+    //     </div>
+        
+    //     <div>
+    //       {products}
+    //     </div> 
+    //   </div>
+    // )
+
+    return (
+      <Card className="MarkerInfo">
+        <Card.Body>
+          <Card.Title>{name}</Card.Title>
+          <Card.Subtitle className="mb-2 text-muted">Card Subtitle</Card.Subtitle>
+          <Card.Text>
+            Some quick example text to build on the card title and make up the bulk of
+            the card's content.
+          </Card.Text>
+          <Card.Text>
+            Some quick example text to build on the card title and make up the bulk of
+            the card's content.
+          </Card.Text>
+          <Card.Link href="#">Card Link</Card.Link>
+          <Card.Link href="#">Another Link</Card.Link>
+        </Card.Body>
+      </Card>
+    )
+  }
+} 
+
 class MyMarker extends PureComponent{
 
   constructor(props) {
     super(props);
+    this.state = {
+      popupInfo: null
+    }
   }
 
   render() {
@@ -84,9 +138,10 @@ class MyMarker extends PureComponent{
               cursor: 'pointer',
               fill: '#d00',
               stroke: 'none',
-              transform: `translate(${-SIZE / 2}px,${-SIZE}px)`
+              transform: `translate(${-SIZE/2}px,${-SIZE}px)`
             }}
-            onMouseEnter={() => this.props.onClick(market)}> 
+             onMouseEnter={() => this.props.onEnter(market)}  
+            > 
             </img>
         </Marker>
     );
@@ -97,7 +152,7 @@ class Markers extends PureComponent {
   render() {
     return this.props.markets.map(market => {
         return (
-          <MyMarker market = {market} key = {market.id} onClick = {this.props.onClick}/>
+          <MyMarker market = {market} key = {market.id} /*onClick = {this.props.onClick} */ onEnter = {this.props.onEnter} onLeave = {this.props.onLeave} />
         )
       }
     )
@@ -116,30 +171,56 @@ class Map extends Component {
         pitch: 0,
       },
       markets: null,
-      popupInfo: null
+      popupInfo: null,
+      popup: false
     };
-    this._onClickMarker = this._onClickMarker.bind(this)
-    this._renderPopup = this._renderPopup.bind(this)
+    //this.onHoverMarker = this.onHoverMarker.bind(this)
+    this.renderPopup = this.renderPopup.bind(this)
+    this.onEnterMarker = this.onEnterMarker.bind(this)
+    this.onLeaveMarker = this.onLeaveMarker.bind(this)
   }
 
-  _onClickMarker = market => {
-    this.setState({popupInfo: market});
-  };
+  // onHoverMarker = market => {
+  //   if (this.state.popupInfo) {
+  //     this.setState({popupInfo: null});
+  //     console.log("popupinfo = null")
+  //   }
+  //   else {
+  //     this.setState({popupInfo: market}); 
+  //     console.log("popupinfo = market")
+  //   }
+  // };
 
-  _renderPopup() {
-    const {popupInfo} = this.state;
+  onEnterMarker = (market) => {
+    this.setState({popupInfo: market})
+    console.log("popupinfo = market")
+  }
+
+  onLeaveMarker = () => {
+    this.setState({popupInfo: null})
+    console.log("popupinfo = null")
+  }
+
+  renderPopup() {
+    const {popupInfo, popup} = this.state;
+    const SIZE = 30;
     return (
-      popupInfo && (
+      (popupInfo || popup) && (
         <Popup
           tipSize={5}
           anchor="top"
           longitude={popupInfo.coords.long}
           latitude={popupInfo.coords.lat}
-          closeOnClick={false}
-          onClose={() => this.setState({popupInfo: null})}
+          closeButton={false}
+          //closeOnClick={true}
+          style={{
+            cursor: 'pointer',
+            fill: '#d00',
+            stroke: 'none',
+            transform: `translate(${-SIZE/2}px,${-SIZE}px)`
+          }}
         >
-          Fill popup info here
-          {/* <CityInfo info={popupInfo} /> */}
+          {<MarkerInfo market={popupInfo}/>}
         </Popup>
       )
     );
@@ -157,7 +238,7 @@ class Map extends Component {
         let marketList = await getMarkets(position.coords.latitude, position.coords.longitude);
         //get details
         let newList = [];
-        for (const market of marketList) {
+        for (const market of marketList.slice(0, 10)) {
           let marketDetails = await getMarketDetails(market.id);
           market.marketDetails = marketDetails;
           newList.push(market);
@@ -184,8 +265,8 @@ class Map extends Component {
         mapStyle="mapbox://styles/mapbox/streets-v11"
         onViewportChange={viewport => this.setState({viewport})}
         >
-        <Markers markets={this.state.markets} onClick={this._onClickMarker}/>
-        {this._renderPopup()}
+        <Markers markets={this.state.markets} /*onClick={this.onHoverMarker}*/ onEnter = {this.onEnterMarker} onLeave = {this.onLeaveMarker}/>
+        {this.renderPopup()}
         <div className="nav" style={navControlStyle}>
           <NavigationControl/>
         </div>
