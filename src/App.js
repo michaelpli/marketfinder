@@ -18,8 +18,15 @@ const axios = require('axios');
 const mapbox_token = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 const navControlStyle = {
   position: 'absolute',
-  bottom: 20,
-  right: 0,
+  bottom: 25,
+  left: 0,
+  padding: '10px'
+};
+
+const geolocateStyle = {
+  position: 'absolute',
+  bottom: 120,
+  left: 0,
   padding: '10px'
 };
 
@@ -225,15 +232,19 @@ class Map extends Component {
     navigator.geolocation.getCurrentPosition(
       async position => {
         let viewport = {...this.state.viewport};
-        viewport.latitude = position.coords.latitude;
-        viewport.longitude = position.coords.longitude;
+        //viewport.latitude = position.coords.latitude;
+        //viewport.longitude = position.coords.longitude;
+        viewport.latitude = 40.7128
+        viewport.longitude = -74.0060
         this.setState({viewport});
 
         //load markets
-        let marketList = await getMarkets(position.coords.latitude, position.coords.longitude);
+        //let marketList = await getMarkets(position.coords.latitude, position.coords.longitude);
+        let marketList = await getMarkets(viewport.latitude, viewport.longitude);
+        
         //get details
         let newList = [];
-        for (const market of marketList.slice(0, 7)) {
+        for (const market of marketList.slice(0, 19)) {
           let marketDetails = await getMarketDetails(market.id);
           if (marketDetails.Products.length == 0 || marketDetails.Schedule.length <= 15) continue
           market.marketDetails = marketDetails;
@@ -265,6 +276,9 @@ class Map extends Component {
         {this.renderPopup()}
         <div className="nav" style={navControlStyle}>
           <NavigationControl/>
+        </div>
+        <div style={geolocateStyle}>
+          <GeolocateControl fitBoundsOptions={{maxZoom: 12}}/>
         </div>
       </MapGL>
     );
