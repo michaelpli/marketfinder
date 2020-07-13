@@ -6,4 +6,38 @@ body, html, #root {
 
 .MarkerInfo {
   max-width: 350px;
+  cursor: default;
+}
+
+.PopupTitle {
+  font-size: 16px;
+  margin-bottom: 3px;
+  color: black;
+}
+
+.PopupAddress {
+  font-style: italic;
+  font-size: 13px;
+  margin-top: 0px;
+  margin-bottom: 5px;
+}
+
+.PopupProductTitle {
+  font-size: 15px;
+  margin-bottom: 2px;
+}
+
+.PopupProducts {
+  font-size: 13px;
+  margin-bottom: 3px;
+}
+
+.PopupScheduleTitle {
+  font-size: 15px;
+  margin-bottom: 2px;
+}
+
+.PopupSchedule {
+  font-size: 13px;
+  margin-bottom: 0px;
 }

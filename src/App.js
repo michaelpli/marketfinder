@@ -58,6 +58,20 @@ function parseGMapsLink(GMapsLink) {
   let long = parseFloat(tempLong[0]);
   return {lat: lat, long: long};
 }
+//ex: '05/01/2016 to 10/31/2016 Sat: 10:00 AM-4:00 PM;Sun: 10:00 AM-4:00 PM;<br> <br> <br> '
+//ex: '06/12/2014 to 11/20/2014 Thu: 11:00 AM-6:00 PM;<br> <br> <br> '
+//ex: ' Thu: 2:00 PM-6:00 PM;<br> <br> <br> '
+function formatSchedule(schedule) {
+  schedule = schedule.slice(0, schedule.length - 16)
+  console.log(schedule)
+  if(schedule.charAt(0) == ' ') { //no month signature
+    const timesArray = schedule.split(';')
+    return timesArray
+  }
+  const months = schedule.slice(0, 24)
+  console.log(months)
+  return schedule
+}
 
 class MarkerInfo extends PureComponent{
 
@@ -70,42 +84,24 @@ class MarkerInfo extends PureComponent{
     const restAddress = address.slice(address.indexOf(','), address.length - 7)
     const products = market.marketDetails.Products
     const googleLink = market.marketDetails.GoogleLink
-    
-    // return(
-    //   <div className="MarkerInfo">
-    //     <div>
-    //       {name}
-    //     </div>
-    //     <div>
-    //       <a style = {{color: "skyblue"}} target="_new" href={googleLink} >
-    //         {streetAddress} 
-    //       </a>
-    //         {restAddress} {/*({dist} miles away)*/}
-    //     </div>
-        
-    //     <div>
-    //       {products}
-    //     </div> 
-    //   </div>
-    // )
+    const schedule = market.marketDetails.Schedule
+    const formatschedule = formatSchedule(schedule)
+    if (formatschedule == null) return
 
-    return (
-      <Card className="MarkerInfo">
-        <Card.Body>
-          <Card.Title>{name}</Card.Title>
-          <Card.Subtitle className="mb-2 text-muted">Card Subtitle</Card.Subtitle>
-          <Card.Text>
-            Some quick example text to build on the card title and make up the bulk of
-            the card's content.
-          </Card.Text>
-          <Card.Text>
-            Some quick example text to build on the card title and make up the bulk of
-            the card's content.
-          </Card.Text>
-          <Card.Link href="#">Card Link</Card.Link>
-          <Card.Link href="#">Another Link</Card.Link>
-        </Card.Body>
-      </Card>
+    return(
+      <div className="MarkerInfo">
+        <div className="PopupTitle">{name}</div>
+        <div className="PopupAddress">
+          <a style = {{color: "RoyalBlue"}} target="_new" href={googleLink} >
+            {streetAddress} 
+          </a>
+          {restAddress+" ("+dist +" mi.)"}
+        </div>
+        <div className="PopupProductTitle">Products:</div>
+        <div className="PopupProducts">{products}</div>
+        <div className="PopupScheduleTitle">Schedule:</div>
+        <div className="PopupSchedule">{formatschedule}</div>
+      </div>
     )
   }
 } 
@@ -193,12 +189,10 @@ class Map extends Component {
 
   onEnterMarker = (market) => {
     this.setState({popupInfo: market})
-    console.log("popupinfo = market")
   }
 
   onLeaveMarker = () => {
     this.setState({popupInfo: null})
-    console.log("popupinfo = null")
   }
 
   renderPopup() {
@@ -211,8 +205,9 @@ class Map extends Component {
           anchor="top"
           longitude={popupInfo.coords.long}
           latitude={popupInfo.coords.lat}
-          closeButton={false}
-          //closeOnClick={true}
+          closeButton={true}
+          onClose = {() => this.setState({popupInfo: null})}
+          closeOnClick={true}
           style={{
             cursor: 'pointer',
             fill: '#d00',
@@ -238,8 +233,9 @@ class Map extends Component {
         let marketList = await getMarkets(position.coords.latitude, position.coords.longitude);
         //get details
         let newList = [];
-        for (const market of marketList.slice(0, 10)) {
+        for (const market of marketList.slice(0, 7)) {
           let marketDetails = await getMarketDetails(market.id);
+          if (marketDetails.Products.length == 0 || marketDetails.Schedule.length <= 15) continue
           market.marketDetails = marketDetails;
           newList.push(market);
         }
