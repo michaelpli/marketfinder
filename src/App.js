@@ -13,9 +13,11 @@ import MapGL, {
 import 'mapbox-gl/dist/mapbox-gl.css'
 import pin from './images/organic.png';
 import Card from 'react-bootstrap/Card';
+import MapboxAutocomplete from 'react-mapbox-autocomplete';
 
 const axios = require('axios');
 const mapbox_token = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
+
 const navControlStyle = {
   position: 'absolute',
   bottom: 25,
@@ -181,6 +183,7 @@ class Map extends Component {
     this.renderPopup = this.renderPopup.bind(this)
     this.onEnterMarker = this.onEnterMarker.bind(this)
     this.onLeaveMarker = this.onLeaveMarker.bind(this)
+    this.suggestionSelect = this.suggestionSelect.bind(this)
   }
 
   // onHoverMarker = market => {
@@ -228,15 +231,27 @@ class Map extends Component {
     );
   }
 
+  suggestionSelect(result, lat, lng, text) {
+    console.log(result, lat, lng, text)
+    let viewport = {...this.state.viewport};
+    viewport.latitude = parseFloat(lat)
+    viewport.longitude = parseFloat(lng)
+    this.setState({viewport});
+    this.setState({markets: null})
+    this.componentDidMount()
+  }
+
   async componentDidMount() {
     navigator.geolocation.getCurrentPosition(
       async position => {
         let viewport = {...this.state.viewport};
         //viewport.latitude = position.coords.latitude;
         //viewport.longitude = position.coords.longitude;
-        viewport.latitude = 40.7128
-        viewport.longitude = -74.0060
-        this.setState({viewport});
+        if (viewport.latitude == null && viewport.longitude == null) {
+          viewport.latitude = 40.7128
+          viewport.longitude = -74.0060
+          this.setState({viewport});
+        }
 
         //load markets
         //let marketList = await getMarkets(position.coords.latitude, position.coords.longitude);
@@ -246,7 +261,7 @@ class Map extends Component {
         let newList = [];
         for (const market of marketList.slice(0, 19)) {
           let marketDetails = await getMarketDetails(market.id);
-          if (marketDetails.Products.length == 0 || marketDetails.Schedule.length <= 15) continue
+          if (marketDetails.Products.length == 0 || marketDetails.Schedule.length <= 16) continue
           market.marketDetails = marketDetails;
           newList.push(market);
         }
@@ -274,6 +289,13 @@ class Map extends Component {
         >
         <Markers markets={this.state.markets} /*onClick={this.onHoverMarker}*/ onEnter = {this.onEnterMarker} onLeave = {this.onLeaveMarker}/>
         {this.renderPopup()}
+        <MapboxAutocomplete 
+          className="MapboxAutocomplete"
+          publicKey={mapbox_token}
+          inputClass='form-control search'
+          onSuggestionSelect={this.suggestionSelect}
+          country='us'
+          resetSearch={false}/>
         <div className="nav" style={navControlStyle}>
           <NavigationControl/>
         </div>
