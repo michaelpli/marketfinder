@@ -43,5 +43,27 @@ body, html, #root {
 }
 
 .MapboxAutocomplete {
-  
+  padding-top: 5px;
+  padding-left: 5px;
+  max-width: 20%;
+}
+
+.Loading {
+  position: relative;
+  left: 50%;
+  margin-left: -150px;
+  top: 50%;
+  margin-top: -150px;
+  //margin: auto;
+  padding-left: 15px;
+  padding-bottom: 10px;
+  width: 300px;
+  height: fit-content;
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 1px 2px skyblue;
+}
+
+.LoadingText {
+  margin-top: 20px;
 }

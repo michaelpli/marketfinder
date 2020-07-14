@@ -12,8 +12,11 @@ import MapGL, {
 } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css'
 import pin from './images/organic.png';
-import Card from 'react-bootstrap/Card';
 import MapboxAutocomplete from 'react-mapbox-autocomplete';
+import FadeIn from "react-fade-in";
+import Lottie from "react-lottie";
+import ReactLoading from "react-loading";
+import * as tractor from "./tractor.json";
 
 const axios = require('axios');
 const mapbox_token = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
@@ -31,6 +34,22 @@ const geolocateStyle = {
   left: 0,
   padding: '10px'
 };
+
+const autocompleteStyle = {
+  position: 'absolute',
+  top: 120,
+  left: 0,
+  padding: '10px'
+}
+
+const tractorOptions = {
+  loop: true,
+  autoplay: true,
+  animationData: tractor.default,
+  rendererSettings: {
+    preserveAspectRatio: "xMidYMid slice"
+  }
+}
 
 async function getMarkets(lat, long) {
   let response = await axios.get('https://search.ams.usda.gov/farmersmarkets/v1/data.svc/locSearch?lat='+lat+'&lng='+long, {})
@@ -217,12 +236,12 @@ class Map extends Component {
           latitude={popupInfo.coords.lat}
           closeButton={true}
           onClose = {() => this.setState({popupInfo: null})}
-          closeOnClick={true}
+          closeOnClick={false}
           style={{
             cursor: 'pointer',
             fill: '#d00',
             stroke: 'none',
-            transform: `translate(${-SIZE/2}px,${-SIZE}px)`
+            transform: `translate(${-SIZE/2}px,${-SIZE}px)`,
           }}
         >
           {<MarkerInfo market={popupInfo}/>}
@@ -275,7 +294,7 @@ class Map extends Component {
 
   render() {
     let {viewport} = this.state;
-    if (!viewport.latitude || !viewport.longitude || !this.state.markets) {
+    if (!viewport.latitude || !viewport.longitude) {
       return <div>Loading...</div> //TODO replace with loading screen
     }
     return (
@@ -287,24 +306,45 @@ class Map extends Component {
         mapStyle="mapbox://styles/mapbox/streets-v11"
         onViewportChange={viewport => this.setState({viewport})}
         >
-        <Markers markets={this.state.markets} /*onClick={this.onHoverMarker}*/ onEnter = {this.onEnterMarker} onLeave = {this.onLeaveMarker}/>
-        {this.renderPopup()}
+
+        <div className="MapboxAutocomplete">
         <MapboxAutocomplete 
-          className="MapboxAutocomplete"
           publicKey={mapbox_token}
           inputClass='form-control search'
           onSuggestionSelect={this.suggestionSelect}
           country='us'
-          resetSearch={false}/>
-        <div className="nav" style={navControlStyle}>
+          resetSearch={true}/>
+        </div>
+
+        {this.state.markets ?
+         <Markers markets={this.state.markets} /*onClick={this.onHoverMarker}*/ onEnter = {this.onEnterMarker} onLeave = {this.onLeaveMarker}/>
+        : loadingMarkets()}
+
+        {this.renderPopup()}
+
+        <div style={navControlStyle}>
           <NavigationControl/>
         </div>
         <div style={geolocateStyle}>
           <GeolocateControl fitBoundsOptions={{maxZoom: 12}}/>
         </div>
+
       </MapGL>
     );
   }  
+}
+
+function loadingMarkets() {
+  return(
+    <div className="Loading">
+      <FadeIn>
+        <div className="d-flex justify-content-center align-items-center">
+          <h5 className="LoadingText">  Finding Nearby Markets</h5>
+          <Lottie options={tractorOptions} height={60} width={60}/>       
+        </div>
+      </FadeIn>
+    </div>
+  )
 }
 
 function App() {
