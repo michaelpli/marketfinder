@@ -17,6 +17,7 @@ import FadeIn from "react-fade-in";
 import Lottie from "react-lottie";
 import ReactLoading from "react-loading";
 import * as tractor from "./tractor.json";
+import * as completeOrange from "./check.json";
 
 const axios = require('axios');
 const mapbox_token = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
@@ -50,6 +51,15 @@ const tractorOptions = {
     preserveAspectRatio: "xMidYMid slice"
   }
 }
+
+const completeOptions = {
+  loop: false,
+  autoplay: true,
+  animationData: completeOrange.default,
+  rendererSettings: {
+     preserveAspectRatio: "xMidYMid slice"
+  }
+};
 
 async function getMarkets(lat, long) {
   let response = await axios.get('https://search.ams.usda.gov/farmersmarkets/v1/data.svc/locSearch?lat='+lat+'&lng='+long, {})
@@ -190,11 +200,12 @@ class Map extends Component {
       viewport: {
         latitude: null,
         longitude: null,
-        zoom: 14,
+        zoom: 13,
         bearing: 0,
         pitch: 0,
       },
       markets: null,
+      loadComplete: false,
       popupInfo: null,
       popup: false
     };
@@ -203,6 +214,7 @@ class Map extends Component {
     this.onEnterMarker = this.onEnterMarker.bind(this)
     this.onLeaveMarker = this.onLeaveMarker.bind(this)
     this.suggestionSelect = this.suggestionSelect.bind(this)
+    this.resetLoadStatus = this.resetLoadStatus.bind(this)
   }
 
   // onHoverMarker = market => {
@@ -222,6 +234,11 @@ class Map extends Component {
 
   onLeaveMarker = () => {
     this.setState({popupInfo: null})
+  }
+
+  resetLoadStatus = () => {
+    this.setState({loadComplete: false})
+    console.log("called")
   }
 
   renderPopup() {
@@ -255,8 +272,8 @@ class Map extends Component {
     let viewport = {...this.state.viewport};
     viewport.latitude = parseFloat(lat)
     viewport.longitude = parseFloat(lng)
-    this.setState({viewport});
-    this.setState({markets: null})
+    viewport.zoom = 13
+    this.setState({viewport, markets: null, loadComplete: false});
     this.componentDidMount()
   }
 
@@ -286,7 +303,10 @@ class Map extends Component {
         }
         console.log('detailMarketList:')
         console.log(newList)
-        this.setState({markets: newList});
+        this.setState({loadComplete: true})
+        setTimeout(() => {
+          this.setState({markets: newList});
+        }, 1500);
       },
       err => console.log(err)
     );
@@ -318,7 +338,7 @@ class Map extends Component {
 
         {this.state.markets ?
          <Markers markets={this.state.markets} /*onClick={this.onHoverMarker}*/ onEnter = {this.onEnterMarker} onLeave = {this.onLeaveMarker}/>
-        : loadingMarkets()}
+        : loadingMarkets(this.state.loadComplete)}
 
         {this.renderPopup()}
 
@@ -334,17 +354,27 @@ class Map extends Component {
   }  
 }
 
-function loadingMarkets() {
+function loadingMarkets(loadComplete) {
   return(
-    <div className="Loading">
+    (loadComplete ? 
+    (<div className="Complete">
       <FadeIn>
         <div className="d-flex justify-content-center align-items-center">
-          <h5 className="LoadingText">  Finding Nearby Markets</h5>
-          <Lottie options={tractorOptions} height={60} width={60}/>       
+          <h5 className="CompleteText">  Finding Nearby Markets</h5>
+          <Lottie options={completeOptions} height={72} width={72} /> 
         </div>
       </FadeIn>
-    </div>
-  )
+    </div>) 
+    :
+    (<div className="Loading">
+    <FadeIn>
+      <div className="d-flex justify-content-center align-items-center">
+        <h5 className="LoadingText">  Finding Nearby Markets</h5>
+        <Lottie options={tractorOptions} height={60} width={60}/>
+      </div>
+    </FadeIn>
+  </div>)
+  ))
 }
 
 function App() {
