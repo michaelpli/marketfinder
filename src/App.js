@@ -262,45 +262,43 @@ class Map extends Component {
   }
 
   suggestionSelect(result, lat, lng, text) {
-    console.log(result, lat, lng, text)
+    console.log(result, lat, lng, text);
+    this.moveMap(parseFloat(lat), parseFloat(lng));
+    this.loadMarkets(parseFloat(lat), parseFloat(lng));
+  }
+
+  async loadMarkets(lat, long) {
+    this.setState({loadComplete: false, markets: null});
+    let marketList = await getMarkets(lat, long);
+    //get details
+    let newList = [];
+    for (const market of marketList.slice(0, 19)) {
+      let marketDetails = await getMarketDetails(market.id);
+      if (marketDetails.Products.length == 0 || marketDetails.Schedule.length <= 16) continue;
+      market.marketDetails = marketDetails;
+      newList.push(market);
+    }
+    console.log('detailMarketList:');
+    console.log(newList);
+    this.setState({loadComplete: true});
+    setTimeout(() => {
+      this.setState({markets: newList});
+    }, 1500);
+  }
+
+  moveMap(lat, long) {
     let viewport = {...this.state.viewport};
-    viewport.latitude = parseFloat(lat)
-    viewport.longitude = parseFloat(lng)
-    viewport.zoom = 13
-    this.setState({viewport, markets: null, loadComplete: false});
-    this.componentDidMount()
+    viewport.latitude = lat;
+    viewport.longitude = long;
+    viewport.zoom = 13;
+    this.setState({viewport});
   }
 
   async componentDidMount() {
     navigator.geolocation.getCurrentPosition(
       async position => {
-        let viewport = {...this.state.viewport};
-        //viewport.latitude = position.coords.latitude;
-        //viewport.longitude = position.coords.longitude;
-        if (viewport.latitude == null && viewport.longitude == null) {
-          viewport.latitude = 40.7128
-          viewport.longitude = -74.0060
-          this.setState({viewport});
-        }
-
-        //load markets
-        //let marketList = await getMarkets(position.coords.latitude, position.coords.longitude);
-        let marketList = await getMarkets(viewport.latitude, viewport.longitude);
-        
-        //get details
-        let newList = [];
-        for (const market of marketList.slice(0, 19)) {
-          let marketDetails = await getMarketDetails(market.id);
-          if (marketDetails.Products.length == 0 || marketDetails.Schedule.length <= 16) continue
-          market.marketDetails = marketDetails;
-          newList.push(market);
-        }
-        console.log('detailMarketList:')
-        console.log(newList)
-        this.setState({loadComplete: true})
-        setTimeout(() => {
-          this.setState({markets: newList});
-        }, 1500);
+        this.moveMap(position.coords.latitude, position.coords.longitude);
+        this.loadMarkets(position.coords.latitude, position.coords.longitude);
       },
       err => console.log(err)
     );
@@ -345,7 +343,7 @@ class Map extends Component {
           <NavigationControl/>
         </div>
         <div style={geolocateStyle}>
-          <GeolocateControl fitBoundsOptions={{maxZoom: 12}}/>
+          <GeolocateControl fitBoundsOptions={{maxZoom: 10}}/>
         </div>
 
       </MapGL>
