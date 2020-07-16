@@ -13,9 +13,9 @@ import MapGL, {
 import 'mapbox-gl/dist/mapbox-gl.css'
 import pin from './images/organic.png';
 import MapboxAutocomplete from 'react-mapbox-autocomplete';
+import Geocoder from 'react-mapbox-gl-geocoder'
 import FadeIn from "react-fade-in";
 import Lottie from "react-lottie";
-import ReactLoading from "react-loading";
 import * as tractor from "./tractor.json";
 import * as completeOrange from "./check.json";
 
@@ -127,7 +127,7 @@ class MarkerInfo extends PureComponent{
     if (formatschedule == null) return
 
     return(
-      <div className="MarkerInfo">
+      <div>
         <div className="PopupTitle">{name}</div>
         <div className="PopupAddress">
           <a style = {{color: "RoyalBlue"}} target="_new" href={googleLink} >
@@ -175,6 +175,7 @@ class MyMarker extends PureComponent{
               transform: `translate(${-SIZE/2}px,${-SIZE}px)`
             }}
              onMouseEnter={() => this.props.onEnter(market)}  
+             onMouseLeave={() => this.props.onLeave()}
             > 
             </img>
         </Marker>
@@ -186,7 +187,13 @@ class Markers extends PureComponent {
   render() {
     return this.props.markets.map(market => {
         return (
-          <MyMarker market = {market} key = {market.id} /*onClick = {this.props.onClick} */ onEnter = {this.props.onEnter} onLeave = {this.props.onLeave} />
+          <MyMarker 
+            market = {market} 
+            key = {market.id} 
+            /*onClick = {this.props.onClick} */ 
+            onEnter = {this.props.onEnter} 
+            onLeave = {this.props.onLeave}
+          />
         )
       }
     )
@@ -207,52 +214,38 @@ class Map extends Component {
       markets: null,
       loadComplete: false,
       popupInfo: null,
-      popup: false
+      overPopup: false,
+      overMarker: false
     };
-    //this.onHoverMarker = this.onHoverMarker.bind(this)
     this.renderPopup = this.renderPopup.bind(this)
     this.onEnterMarker = this.onEnterMarker.bind(this)
     this.onLeaveMarker = this.onLeaveMarker.bind(this)
     this.suggestionSelect = this.suggestionSelect.bind(this)
-    this.resetLoadStatus = this.resetLoadStatus.bind(this)
   }
 
-  // onHoverMarker = market => {
-  //   if (this.state.popupInfo) {
-  //     this.setState({popupInfo: null});
-  //     console.log("popupinfo = null")
-  //   }
-  //   else {
-  //     this.setState({popupInfo: market}); 
-  //     console.log("popupinfo = market")
-  //   }
-  // };
-
   onEnterMarker = (market) => {
-    this.setState({popupInfo: market})
+    this.setState({popupInfo: market, overMarker: true})
   }
 
   onLeaveMarker = () => {
-    this.setState({popupInfo: null})
-  }
-
-  resetLoadStatus = () => {
-    this.setState({loadComplete: false})
-    console.log("called")
+    this.setState({overMarker: false})
   }
 
   renderPopup() {
-    const {popupInfo, popup} = this.state;
+    const {popupInfo, overPopup, overMarker} = this.state;
     const SIZE = 30;
     return (
-      (popupInfo || popup) && (
+      (overMarker || overPopup) && (
+        <div onMouseEnter={() => this.setState({overPopup: true})} onMouseLeave={() => this.setState({overPopup : false})}>
         <Popup
-          tipSize={5}
+          className="Popup"
+          offsetTop={0}
+          tipSize={0}
           anchor="top"
           longitude={popupInfo.coords.long}
           latitude={popupInfo.coords.lat}
-          closeButton={true}
-          onClose = {() => this.setState({popupInfo: null})}
+          closeButton={false}
+          //onClose = {() => this.setState({popupInfo: null, popup: false})}
           closeOnClick={false}
           style={{
             cursor: 'pointer',
@@ -263,6 +256,7 @@ class Map extends Component {
         >
           {<MarkerInfo market={popupInfo}/>}
         </Popup>
+        </div>
       )
     );
   }
@@ -334,10 +328,15 @@ class Map extends Component {
           onSuggestionSelect={this.suggestionSelect}
           country='us'
           resetSearch={true}/>
-        </div>
+        </div> 
+
+        {/* <Geocoder
+                    mapboxApiAccessToken={mapbox_token} onSelected={this.suggestionSelect} viewport={viewport} hideOnSelect={true}
+                    //queryParams={queryParams}
+                /> */}
 
         {this.state.markets ?
-         <Markers markets={this.state.markets} /*onClick={this.onHoverMarker}*/ onEnter = {this.onEnterMarker} onLeave = {this.onLeaveMarker}/>
+         <Markers markets={this.state.markets} /*onClick={this.onHoverMarker}*/ onEnter = {this.onEnterMarker} onLeave = {this.onLeaveMarker} />
         : loadingMarkets(this.state.loadComplete)}
 
         {this.renderPopup()}

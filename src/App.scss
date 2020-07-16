@@ -4,9 +4,10 @@ body, html, #root {
   height: 100%;
 }
 
-.MarkerInfo {
+.Popup {
   max-width: 350px;
   cursor: default;
+  box-shadow: 1px 1px lightgray;
 }
 
 .PopupTitle {

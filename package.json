@@ -21,6 +21,7 @@
     "react-lottie": "^1.2.3",
     "react-map-gl": "^5.2.7",
     "react-mapbox-autocomplete": "^0.2.3",
+    "react-mapbox-gl-geocoder": "^1.1.0",
     "react-scripts": "3.4.1",
     "typescript": "^3.9.6"
   },
