@@ -18,6 +18,7 @@ import FadeIn from "react-fade-in";
 import Lottie from "react-lottie";
 import * as tractor from "./tractor.json";
 import * as completeOrange from "./check.json";
+import Button from 'react-bootstrap/Button';
 
 const axios = require('axios');
 const mapbox_token = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
@@ -34,6 +35,19 @@ const geolocateStyle = {
   bottom: 120,
   left: 0,
   padding: '10px'
+};
+
+const refreshStyle = {
+  //position: 'absolute',
+  position: 'relative',
+  left: '50%',
+  marginLeft: '-65px',
+  width: '130px',
+  top: -50,
+  paddingLeft: '14px',
+  paddingRight: '11px',
+  paddingTop: '7px',
+  paddingBottom: '7px',
 };
 
 const tractorOptions = {
@@ -209,12 +223,15 @@ class Map extends Component {
       popupInfo: null,
       overPopup: false,
       overMarker: false,
-      flag: false,
+      moved: false,
+      movedNum: 0,
     };
     this.renderPopup = this.renderPopup.bind(this)
     this.onEnterMarker = this.onEnterMarker.bind(this)
     this.onLeaveMarker = this.onLeaveMarker.bind(this)
     this.suggestionSelect = this.suggestionSelect.bind(this)
+    this.refresh = this.refresh.bind(this)
+    console.log("this.state.moved ="+ this.state.moved)
   }
 
   onEnterMarker = (market) => {
@@ -259,7 +276,13 @@ class Map extends Component {
     console.log(result, lat, lng, text);
     this.moveMap(parseFloat(lat), parseFloat(lng));
     this.loadMarkets(parseFloat(lat), parseFloat(lng));
-    this.setState({flag: !this.state.flag})
+    this.setState({moved: false})
+  }
+
+  refresh() {
+    let viewport = {...this.state.viewport};
+    this.loadMarkets(viewport.latitude, viewport.longitude);
+    this.setState({moved: false})
   }
 
   async loadMarkets(lat, long) {
@@ -311,17 +334,22 @@ class Map extends Component {
         width = '100vw'
         height = '100vh'
         mapStyle="mapbox://styles/mapbox/streets-v11"
-        onViewportChange={viewport => this.setState({viewport})}
+        onViewportChange={viewport => this.setState({viewport, moved: true, movedNum: this.state.movedNum + 1})}
         >
 
         <div className="MapboxAutocomplete">
-        <MapboxAutocomplete 
-          publicKey={mapbox_token}
-          inputClass='form-control search'
-          onSuggestionSelect={this.suggestionSelect}
-          country='us'
-          resetSearch={true}/>
-        </div> 
+          <MapboxAutocomplete 
+            publicKey={mapbox_token}
+            inputClass='form-control search'
+            onSuggestionSelect={this.suggestionSelect}
+            country='us'
+            resetSearch={true}/>
+        </div>
+
+        {this.state.moved && this.state.movedNum > 1 &&
+        <div style={refreshStyle} className='Refresh' onClick={this.refresh}>
+          Search this area
+        </div>}
 
         {this.state.markets ?
          <Markers markets={this.state.markets} /*onClick={this.onHoverMarker}*/ onEnter = {this.onEnterMarker} onLeave = {this.onLeaveMarker} />
