@@ -36,13 +36,6 @@ const geolocateStyle = {
   padding: '10px'
 };
 
-const autocompleteStyle = {
-  position: 'absolute',
-  top: 120,
-  left: 0,
-  padding: '10px'
-}
-
 const tractorOptions = {
   loop: true,
   autoplay: true,
@@ -215,7 +208,8 @@ class Map extends Component {
       loadComplete: false,
       popupInfo: null,
       overPopup: false,
-      overMarker: false
+      overMarker: false,
+      flag: false,
     };
     this.renderPopup = this.renderPopup.bind(this)
     this.onEnterMarker = this.onEnterMarker.bind(this)
@@ -265,6 +259,7 @@ class Map extends Component {
     console.log(result, lat, lng, text);
     this.moveMap(parseFloat(lat), parseFloat(lng));
     this.loadMarkets(parseFloat(lat), parseFloat(lng));
+    this.setState({flag: !this.state.flag})
   }
 
   async loadMarkets(lat, long) {
@@ -283,7 +278,7 @@ class Map extends Component {
     this.setState({loadComplete: true});
     setTimeout(() => {
       this.setState({markets: newList});
-    }, 1500);
+    }, 1200);
   }
 
   moveMap(lat, long) {
@@ -327,11 +322,6 @@ class Map extends Component {
           country='us'
           resetSearch={true}/>
         </div> 
-
-        {/* <Geocoder
-                    mapboxApiAccessToken={mapbox_token} onSelected={this.suggestionSelect} viewport={viewport} hideOnSelect={true}
-                    //queryParams={queryParams}
-                /> */}
 
         {this.state.markets ?
          <Markers markets={this.state.markets} /*onClick={this.onHoverMarker}*/ onEnter = {this.onEnterMarker} onLeave = {this.onLeaveMarker} />
