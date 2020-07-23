@@ -68,6 +68,34 @@ const completeOptions = {
   }
 };
 
+// const monthMap = new Map();
+// monthMap.set('01', 'January');
+// monthMap.set('02', 'February');
+// monthMap.set('03', 'March');
+// monthMap.set('04', 'April');
+// monthMap.set('05', 'May');
+// monthMap.set('06', 'June');
+// monthMap.set('07', 'July');
+// monthMap.set('08', 'August');
+// monthMap.set('09', 'September');
+// monthMap.set('10', 'October');
+// monthMap.set('11', 'November');
+// monthMap.set('12', 'December');
+
+const monthMap = {};
+monthMap['01'] = 'January';
+monthMap['02'] = 'February';
+monthMap['03'] = 'March';
+monthMap['04'] = 'April';
+monthMap['05'] = 'May';
+monthMap['06'] = 'June';
+monthMap['07'] = 'July';
+monthMap['08'] = 'August';
+monthMap['09'] = 'September';
+monthMap['10'] = 'October';
+monthMap['11'] = 'November';
+monthMap['12'] = 'December';
+
 async function getMarkets(lat, long) {
   let response = await axios.get('https://search.ams.usda.gov/farmersmarkets/v1/data.svc/locSearch?lat='+lat+'&lng='+long, {})
     .then((response) => {
@@ -109,17 +137,52 @@ function parseGMapsLink(GMapsLink) {
 function formatSchedule(schedule) {
   schedule = schedule.slice(0, schedule.length - 16)
   console.log(schedule)
+  let endIndex = schedule.indexOf('<br>');
+  if (endIndex >= 0) {
+    schedule = schedule.substring(0, endIndex);
+  }
   if(schedule.charAt(0) == ' ') { //no month signature
     const timesArray = schedule.split(';')
     return timesArray
+  }
+  const years = [/\/2008/g, /\/2009/g, /\/2010/g, /\/2011/g, /\/2012/g, /\/2013/g, /\/2014/g, /\/2015/g, /\/2016/g, /\/2017/g, /\/2018/g, /\/2019/g, /\/2020/g, /\/2021/g]
+  for (let year of years) {
+    schedule = schedule.replace(year, '')
+  }
+  for (let i = 0; i < schedule.length; i++) {
+    if (schedule.charAt(i) == '/') {
+      console.log(schedule.substr(i-2, 5))
+      schedule = schedule.replaceMonth(i, formatMonth(schedule.substr(i-2, 5)))
+    }
   }
   const months = schedule.slice(0, 24)
   console.log(months)
   return schedule
 }
 
-class MarkerInfo extends PureComponent{
+function formatMonth(s) {
+  let tempArr = s.split('/');
+  let month = tempArr[0];
+  let day = parseInt(tempArr[1]);
+  let monthString = monthMap[month];
+  var dayString;
+  if (day < 10) {
+    dayString = "Early";
+  }
+  else if (day < 20) {
+    dayString = "Mid";
+  }
+  else {
+    dayString = "Late";
+  }
+  return dayString + " " + monthString;
+}
 
+String.prototype.replaceMonth = function(index, replacement) {
+  return this.substr(0, index-2) + replacement + this.substr(index+3);
+}
+
+class MarkerInfo extends PureComponent{
   render() {
     const market = this.props.market;
     const name = market.marketname.slice(4)
@@ -231,7 +294,6 @@ class Map extends Component {
     this.onLeaveMarker = this.onLeaveMarker.bind(this)
     this.suggestionSelect = this.suggestionSelect.bind(this)
     this.refresh = this.refresh.bind(this)
-    console.log("this.state.moved ="+ this.state.moved)
   }
 
   onEnterMarker = (market) => {
