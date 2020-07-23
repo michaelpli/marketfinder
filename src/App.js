@@ -149,14 +149,19 @@ function formatSchedule(schedule) {
   for (let year of years) {
     schedule = schedule.replace(year, '')
   }
+  var newline = true;
   for (let i = 0; i < schedule.length; i++) {
     if (schedule.charAt(i) == '/') {
-      console.log(schedule.substr(i-2, 5))
-      schedule = schedule.replaceMonth(i, formatMonth(schedule.substr(i-2, 5)))
+      newline = !newline;
+      console.log(schedule.substr(i-2, 5));
+      var newMonth = formatMonth(schedule.substr(i-2, 5)) + (newline ? ';' : '')
+      schedule = schedule.replaceMonth(i,  newMonth)
     }
   }
-  const months = schedule.slice(0, 24)
-  console.log(months)
+  schedule = schedule.replace(/-/g, '\u2014')
+  //schedule = schedule.replace(/:00/g, '')
+  schedule = schedule.replace(/ PM/g, 'PM')
+  schedule = schedule.replace(/ AM/g, 'AM')
   return schedule
 }
 
@@ -195,7 +200,8 @@ class MarkerInfo extends PureComponent{
     const schedule = market.marketDetails.Schedule
     const formatschedule = formatSchedule(schedule)
     if (formatschedule == null) return
-
+    const scheduleArr = formatschedule.split(';')
+  
     return(
       <div>
         <div className="PopupTitle">{name}</div>
@@ -208,7 +214,8 @@ class MarkerInfo extends PureComponent{
         <div className="PopupProductTitle">Products:</div>
         <div className="PopupProducts">{products}</div>
         <div className="PopupScheduleTitle">Schedule:</div>
-        <div className="PopupSchedule">{formatschedule}</div>
+        {scheduleArr.map(x => <div key={x} className="PopupSchedule">{x}</div>)}
+        {/* <div className="PopupSchedule">{formatschedule}</div> */}
       </div>
     )
   }
