@@ -94,3 +94,9 @@ body, html, #root {
   z-index: 10;
   cursor: pointer;
 }
+
+.InitialLoading {
+  position: relative;
+  top: 50%;
+  margin-top: -150px;
+}

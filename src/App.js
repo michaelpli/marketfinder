@@ -11,7 +11,7 @@ import MapGL, {
   Marker
 } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css'
-import pin from './images/organic.png';
+import pin from './images/red-blue-marker.png';
 import MapboxAutocomplete from 'react-mapbox-autocomplete';
 import Geocoder from 'react-mapbox-gl-geocoder'
 import FadeIn from "react-fade-in";
@@ -19,6 +19,7 @@ import Lottie from "react-lottie";
 import * as tractor from "./tractor.json";
 import * as completeOrange from "./check.json";
 import Button from 'react-bootstrap/Button';
+import Badge from 'react-bootstrap/Badge'
 
 const axios = require('axios');
 const mapbox_token = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
@@ -195,11 +196,11 @@ class MarkerInfo extends PureComponent{
     const address = market.marketDetails.Address
     const streetAddress = address.slice(0, address.indexOf(','))
     const restAddress = address.slice(address.indexOf(','), address.length - 7)
-    const products = market.marketDetails.Products
+    const products = market.marketDetails.Products.replace(/; /g, ' • ')
     const googleLink = market.marketDetails.GoogleLink
     const schedule = market.marketDetails.Schedule
     const formatschedule = formatSchedule(schedule)
-    if (formatschedule == null) return
+    if (formatschedule == null) {return};
     const scheduleArr = formatschedule.split(';')
   
     return(
@@ -214,7 +215,7 @@ class MarkerInfo extends PureComponent{
         <div className="PopupProductTitle">Products:</div>
         <div className="PopupProducts">{products}</div>
         <div className="PopupScheduleTitle">Schedule:</div>
-        {scheduleArr.map(x => <div key={x} className="PopupSchedule">{x}</div>)}
+        {scheduleArr.map(row => <div key={row} className="PopupSchedule">{row}</div>)}
         {/* <div className="PopupSchedule">{formatschedule}</div> */}
       </div>
     )
@@ -235,7 +236,7 @@ class MyMarker extends PureComponent{
     let GMapsLink = market.marketDetails.GoogleLink;
     let coords = parseGMapsLink(GMapsLink);
     market = {...market, coords: coords};
-    const SIZE = 30;
+    const SIZE = 35;
     return (
         <Marker
           key={market.id} 
@@ -243,7 +244,7 @@ class MyMarker extends PureComponent{
           longitude={coords.long}>
             <img 
             height={SIZE}
-            viewBox="0 0 24 24"
+            viewBox="0 0 30 30"
             src={pin} 
             style={{
               cursor: 'pointer',
@@ -384,7 +385,9 @@ class Map extends Component {
   async componentDidMount() {
     navigator.geolocation.getCurrentPosition(
       async position => {
+        setTimeout(() => {
         this.moveMap(position.coords.latitude, position.coords.longitude);
+        }, 5000);
         this.loadMarkets(position.coords.latitude, position.coords.longitude);
       },
       err => console.log(err)
@@ -394,7 +397,7 @@ class Map extends Component {
   render() {
     let {viewport} = this.state;
     if (!viewport.latitude || !viewport.longitude) {
-      return <div>Loading...</div> //TODO replace with loading screen
+      return initialLoad() //TODO replace with loading screen
     }
     return (
       <MapGL
@@ -436,6 +439,19 @@ class Map extends Component {
       </MapGL>
     );
   }  
+}
+
+function initialLoad() {
+  return(
+  <div className="InitialLoading">
+      <FadeIn>
+        <h3 className="d-flex justify-content-center align-items-center">Getting Ready</h3>
+        <div className="d-flex justify-content-center align-items-center">
+          <Lottie options={tractorOptions} height={175} width={175} /> 
+        </div>
+      </FadeIn>
+    </div> 
+    )
 }
 
 function loadingMarkets(loadComplete) {
