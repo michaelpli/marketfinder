@@ -8,6 +8,7 @@ body, html, #root {
   max-width: 350px;
   cursor: default;
   box-shadow: 1px 1px lightgray;
+  z-index: 9999;
 }
 
 .PopupTitle {
@@ -47,6 +48,36 @@ body, html, #root {
   padding-top: 5px;
   padding-left: 5px;
   max-width: 20%;
+  z-index: 10;
+}
+
+.react-mapbox-ac-menu {
+  width: auto;
+  position: absolute;
+  z-index: 10;
+  background-color: white;
+  border: 1px solid #ccc;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin-top: -1.3rem;
+  border-radius: 10px;
+}
+
+.react-mapbox-ac-suggestion:hover {
+  background-color: rgb(24, 213, 238);
+}
+
+.react-mapbox-ac-suggestion {
+  font-size: 18px;
+  margin-bottom: 2px;
+  cursor: pointer;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.search {
+  z-index: 9999;
+  border-radius: 20px;
 }
 
 .Loading {
@@ -65,7 +96,7 @@ body, html, #root {
 }
 
 .LoadingText {
-  margin-top: 20px;
+  margin-top: 18px;
 }
 
 .Complete {
@@ -84,13 +115,13 @@ body, html, #root {
 }
 
 .CompleteText {
-  margin-top: 08px;
+  margin-top: 06px; 
 }
 
 .Refresh {
   border-radius: 20px;
-  box-shadow: 1px 1px lightgray;
-  background-color: white;
+  box-shadow: 1.5px 1.5px lightgray;
+  background-color: rgb(255, 255, 255);
   z-index: 10;
   cursor: pointer;
 }

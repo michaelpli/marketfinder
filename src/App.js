@@ -17,7 +17,7 @@ import Geocoder from 'react-mapbox-gl-geocoder'
 import FadeIn from "react-fade-in";
 import Lottie from "react-lottie";
 import * as tractor from "./tractor.json";
-import * as completeOrange from "./check.json";
+import * as completeOrange from "./check-gold.json";
 import Button from 'react-bootstrap/Button';
 import Badge from 'react-bootstrap/Badge'
 
@@ -39,7 +39,6 @@ const geolocateStyle = {
 };
 
 const refreshStyle = {
-  //position: 'absolute',
   position: 'relative',
   left: '50%',
   marginLeft: '-65px',
@@ -68,20 +67,6 @@ const completeOptions = {
      preserveAspectRatio: "xMidYMid slice"
   }
 };
-
-// const monthMap = new Map();
-// monthMap.set('01', 'January');
-// monthMap.set('02', 'February');
-// monthMap.set('03', 'March');
-// monthMap.set('04', 'April');
-// monthMap.set('05', 'May');
-// monthMap.set('06', 'June');
-// monthMap.set('07', 'July');
-// monthMap.set('08', 'August');
-// monthMap.set('09', 'September');
-// monthMap.set('10', 'October');
-// monthMap.set('11', 'November');
-// monthMap.set('12', 'December');
 
 const monthMap = {};
 monthMap['01'] = 'January';
@@ -201,7 +186,13 @@ class MarkerInfo extends PureComponent{
     const schedule = market.marketDetails.Schedule
     const formatschedule = formatSchedule(schedule)
     if (formatschedule == null) {return};
-    const scheduleArr = formatschedule.split(';')
+    var scheduleArr = [];
+    try {
+      scheduleArr = formatschedule.split(';')
+    }
+    catch(err) {
+    }
+    
   
     return(
       <div>
@@ -216,11 +207,10 @@ class MarkerInfo extends PureComponent{
         <div className="PopupProducts">{products}</div>
         <div className="PopupScheduleTitle">Schedule:</div>
         {scheduleArr.map(row => <div key={row} className="PopupSchedule">{row}</div>)}
-        {/* <div className="PopupSchedule">{formatschedule}</div> */}
       </div>
     )
   }
-} 
+}
 
 class MyMarker extends PureComponent{
 
@@ -387,7 +377,7 @@ class Map extends Component {
       async position => {
         setTimeout(() => {
         this.moveMap(position.coords.latitude, position.coords.longitude);
-        }, 5000);
+        }, 0);
         this.loadMarkets(position.coords.latitude, position.coords.longitude);
       },
       err => console.log(err)
@@ -397,7 +387,7 @@ class Map extends Component {
   render() {
     let {viewport} = this.state;
     if (!viewport.latitude || !viewport.longitude) {
-      return initialLoad() //TODO replace with loading screen
+      return initialLoad()
     }
     return (
       <MapGL
