@@ -1,3 +1,5 @@
+$pincolor:rgb(255, 112, 107);
+
 body, html, #root {
   font: 14px "Century Gothic", Futura, sans-serif;
   width: 100%;
@@ -12,7 +14,7 @@ body, html, #root {
 }
 
 .PopupTitle {
-  font-size: 16px;
+  font-size: 17px;
   margin-bottom: 3px;
   color: black;
 }
@@ -21,22 +23,22 @@ body, html, #root {
   font-style: italic;
   font-size: 13px;
   margin-top: 0px;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
 
 .PopupProductTitle {
-  font-size: 15px;
-  margin-bottom: 2px;
+  font-size: 16px;
+  margin-bottom: 3px;
 }
 
 .PopupProducts {
   font-size: 13px;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
 
 .PopupScheduleTitle {
-  font-size: 15px;
-  margin-bottom: 2px;
+  font-size: 16px;
+  margin-bottom: 3px;
 }
 
 .PopupSchedule {
@@ -124,6 +126,19 @@ body, html, #root {
   background-color: rgb(255, 255, 255);
   z-index: 10;
   cursor: pointer;
+  transition: 0.38s;
+}
+
+.Refresh:hover {
+  background-color:$pincolor;
+}
+
+.PinImage {
+  transition: 0.38s;
+}
+
+.PinImage:hover {
+  filter: brightness(120%);
 }
 
 .InitialLoading {
@@ -132,27 +147,10 @@ body, html, #root {
   margin-top: -150px;
 }
 
-.InfoButton {
-  position: 'absolute';
-  top: 5px;
-  right: 5px;
-  //background-color: ;
-  border: solid;
-  border-color: black;
-  border-radius: 50%;
-  border-width: thin;
-  cursor: pointer;
-  width: 50px;
-  height: 50px; 
+.InfoPic {
+  transition: 0.38s;
 }
 
-.InfoPic {
-  margin-left: 50%;
-  margin-right: 50%;
-  // margin-top: auto;
-  // margin-bottom: auto;
-  //vertical-align: middle;
-  position: absolute;
-  top: 50%;
-  margin-top: 14px;
+.InfoPic:hover {
+  filter: brightness(120%);
 }
