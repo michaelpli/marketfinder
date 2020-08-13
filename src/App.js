@@ -1,7 +1,6 @@
 import React, {Component, PureComponent} from 'react';
 import './App.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
-//import ReactMapGL, {NavigationControl, Marker} from 'react-map-gl';
 import MapGL, {
   Popup,
   NavigationControl,
@@ -12,6 +11,7 @@ import MapGL, {
 } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css'
 import pin from './images/red-blue-marker.png';
+import info from './images/info3.png'
 import MapboxAutocomplete from 'react-mapbox-autocomplete';
 import Geocoder from 'react-mapbox-gl-geocoder'
 import FadeIn from "react-fade-in";
@@ -19,7 +19,7 @@ import Lottie from "react-lottie";
 import * as tractor from "./tractor.json";
 import * as completeOrange from "./check-gold.json";
 import Button from 'react-bootstrap/Button';
-import Badge from 'react-bootstrap/Badge'
+import Modal from 'react-bootstrap/Modal'
 
 const axios = require('axios');
 const mapbox_token = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
@@ -49,6 +49,31 @@ const refreshStyle = {
   paddingTop: '7px',
   paddingBottom: '7px',
 };
+
+const infoButtonStyle = {
+  position: 'absolute',
+  top: 5,
+  right: 5,
+  //border: 'solid',
+  borderColor: 'black',
+  borderRadius: '50%',
+  borderWidth: 'thin',
+  cursor: 'pointer',
+  width: '50px',
+  height: '50px',
+}
+
+const infoPicStyle = {
+  position: 'absolute',
+  top: 5,
+  right: 5,
+  width: '35px',
+  height: '35px',
+  // top: '50%',
+  // right: '50%',
+  // marginTop: '-15px',
+  // marginRight: '-15px',
+}
 
 const tractorOptions = {
   loop: true,
@@ -268,6 +293,60 @@ class Markers extends PureComponent {
   }
 }
 
+function InfoModal(props) {
+  return (
+    <Modal
+      {...props}
+      size="lg"
+      aria-labelledby="contained-modal-title-vcenter"
+      centered
+    >
+      <Modal.Header closeButton>
+        <img height={25} src={pin} />
+        <Modal.Title id="contained-modal-title-vcenter">
+          &nbsp; What is <i>marketfinder</i>?
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <h4>About</h4>
+        <p style={{fontSize: 16}}>marketfinder is a web app that helps users easily access detailed information about their local farmers markets. 
+          I love to shop at different farmers markets, but I’ve always found it difficult to figure out if a certain market 
+          will have the specific foods I’m looking for, not to mention if it’s currently open for the season or not. In
+          addition, many people are  simply unsure where to find the closest markets and are unaware of all the different
+          products they have to offer. So, I created marketfinder to streamline the farmers market experience and to 
+          encourage people to shop local.</p>
+        <p style={{fontSize: 16}}>After searching for an area you want to explore, you’ll be able to interactively visualize the closest farmers 
+          markets nearby and view details about the products they offer and the months they’ll be in season for.</p>
+
+        <h4>Why Farmers Markets?</h4>
+        <p style={{fontSize: 16}}>The fruits and veggies you buy at the farmers market are the freshest available. They’re brought directly to you: 
+          no long-distance shipping, no gassing to simulate the ripening process, no sitting for weeks in storage. </p>
+        <p style={{fontSize: 16}}>It also contributes to protecting the environment. Food in the U.S. travels an average of 1,500 miles to get to 
+          your plate. All this shipping consumes large amounts of natural resources, contributes to pollution, and creates 
+          trash with excess packaging.</p>
+        <p style={{fontSize: 16}}>Finally, shopping at farmers markets makes a big impact on family farmers. Now more than ever, small family farms 
+          have a hard time competing in the food marketplace. Buying directly from farmers gives them a better return for their 
+          produce and is a great way to support your community.</p>
+
+        <h4>Technology</h4>
+        <p style={{fontSize: 16}}>marketfinder is built with React (<a style = {{color: "Teal"}} target="_new" href='https://create-react-app.dev/' >
+            create-react-app</a>). Mapping capabilities are provided by <a style = {{color: "Teal"}} target="_new" 
+            href='https://www.mapbox.com/'>MapBox</a>, and detailed farmers 
+          market data is sourced from the USDA Farmers Market Directory <a style = {{color: "Teal"}} target="_new" 
+            href='https://www.ams.usda.gov/local-food-directories/farmersmarkets'>API</a>. <a style = {{color: "Teal"}} target="_new" 
+            href='https://react-bootstrap.netlify.app/'>React-Bootstrap</a> for styling, hosted by <a style = {{color: "Teal"}} target="_new" 
+            href='https://www.heroku.com'>Heroku</a>. 
+          Feel free to check out the source code on my <a style = {{color: "Teal"}} target="_new" 
+            href='https://www.github.com/michaelpli'>GitHub</a>.</p>
+
+      </Modal.Body>
+      <Modal.Footer>
+        <Button onClick={props.onHide}>Close</Button>
+      </Modal.Footer>
+    </Modal>
+  );
+}
+
 class Map extends Component {
   constructor(props) {
     super(props);
@@ -286,6 +365,7 @@ class Map extends Component {
       overMarker: false,
       moved: false,
       movedNum: 0,
+      info: false,
     };
     this.renderPopup = this.renderPopup.bind(this)
     this.onEnterMarker = this.onEnterMarker.bind(this)
@@ -425,6 +505,22 @@ class Map extends Component {
         <div style={geolocateStyle}>
           <GeolocateControl fitBoundsOptions={{maxZoom: 10}}/>
         </div>
+
+        {/* <div className="InfoButton" style={infoButtonStyle} variant="info" onClick={() => this.setState({info: true})}>
+          About
+        </div> */}
+
+        <div /*className="InfoButton" */ style={infoButtonStyle}>
+          <img 
+              //className="InfoPic"
+              style={infoPicStyle}
+              height={50}
+              src={info} 
+              onClick={() => this.setState({info: true})}
+          />
+        </div>
+
+        <InfoModal show={this.state.info} onHide={() => this.setState({info: false})}/>
 
       </MapGL>
     );

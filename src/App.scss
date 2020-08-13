@@ -131,3 +131,28 @@ body, html, #root {
   top: 50%;
   margin-top: -150px;
 }
+
+.InfoButton {
+  position: 'absolute';
+  top: 5px;
+  right: 5px;
+  //background-color: ;
+  border: solid;
+  border-color: black;
+  border-radius: 50%;
+  border-width: thin;
+  cursor: pointer;
+  width: 50px;
+  height: 50px; 
+}
+
+.InfoPic {
+  margin-left: 50%;
+  margin-right: 50%;
+  // margin-top: auto;
+  // margin-bottom: auto;
+  //vertical-align: middle;
+  position: absolute;
+  top: 50%;
+  margin-top: 14px;
+}
