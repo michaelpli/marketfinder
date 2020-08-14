@@ -35,18 +35,6 @@ const geolocateStyle = {
   padding: '10px'
 };
 
-// const refreshStyle = {
-//   position: 'relative',
-//   left: '50%',
-//   marginLeft: '-65px',
-//   width: '130px',
-//   top: -55,
-//   paddingLeft: '14px',
-//   paddingRight: '11px',
-//   paddingTop: '7px',
-//   paddingBottom: '7px',
-// };
-
 const refreshStyle = {
   position: 'absolute',
   left: '50%',
