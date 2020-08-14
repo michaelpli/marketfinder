@@ -34,6 +34,7 @@ body, html, #root {
 .PopupProducts {
   font-size: 13px;
   margin-bottom: 6px;
+  font-weight: lighter;
 }
 
 .PopupScheduleTitle {
@@ -44,6 +45,7 @@ body, html, #root {
 .PopupSchedule {
   font-size: 13px;
   margin-bottom: 0px;
+  font-weight: lighter;
 }
 
 .MapboxAutocomplete {
@@ -66,12 +68,12 @@ body, html, #root {
 }
 
 .react-mapbox-ac-suggestion:hover {
-  background-color: rgb(24, 213, 238);
+  background-color: skyblue;
 }
 
 .react-mapbox-ac-suggestion {
-  font-size: 18px;
-  margin-bottom: 2px;
+  font-size: 14px;
+  margin-bottom: 1px;
   cursor: pointer;
   padding-left: 1.5rem;
   padding-right: 1.5rem;
@@ -153,4 +155,10 @@ body, html, #root {
 
 .InfoPic:hover {
   filter: brightness(120%);
+}
+
+.InfoModalText {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 150%;
 }

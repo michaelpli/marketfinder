@@ -26,7 +26,8 @@ class MyMarker extends PureComponent{
               className="PinImage"
               height={SIZE}
               viewBox="0 0 30 30"
-              src={pin} 
+              src={pin}
+              alt="pin" 
               style={{
                 cursor: 'pointer',
                 fill: '#d00',

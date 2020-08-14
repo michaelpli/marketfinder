@@ -35,12 +35,25 @@ const geolocateStyle = {
   padding: '10px'
 };
 
+// const refreshStyle = {
+//   position: 'relative',
+//   left: '50%',
+//   marginLeft: '-65px',
+//   width: '130px',
+//   top: -55,
+//   paddingLeft: '14px',
+//   paddingRight: '11px',
+//   paddingTop: '7px',
+//   paddingBottom: '7px',
+// };
+
 const refreshStyle = {
-  position: 'relative',
+  position: 'absolute',
   left: '50%',
-  marginLeft: '-65px',
+  right: '50%',
   width: '130px',
-  top: -50,
+  marginLeft: '-65px',
+  top: 5,
   paddingLeft: '14px',
   paddingRight: '11px',
   paddingTop: '7px',
@@ -200,7 +213,7 @@ class Map extends Component {
     let newList = [];
     for (const market of marketList.slice(0, 19)) {
       let marketDetails = await getMarketDetails(market.id);
-      if (marketDetails.Products.length == 0 || marketDetails.Schedule.length <= 16) continue;
+      if (marketDetails.Products.length === 0 || marketDetails.Schedule.length <= 16) continue;
       market.marketDetails = marketDetails;
       newList.push(market);
     }
@@ -277,7 +290,8 @@ class Map extends Component {
             className='InfoPic'
             style={infoPicStyle}
             height={50}
-            src={info} 
+            src={info}
+            alt="pin" 
             onClick={() => this.setState({info: true})}
           />
         </div>

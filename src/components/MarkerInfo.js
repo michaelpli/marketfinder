@@ -45,7 +45,7 @@ class MarkerInfo extends PureComponent{
             {restAddress+" ("+dist +" mi.)"}
           </div>
           <div className="PopupProductTitle">Products:</div>
-          <div className="PopupProducts">{products}</div>
+          <div className="PopupProducts" >{products}</div>
           <div className="PopupScheduleTitle">Schedule:</div>
           {scheduleArr.map(row => <div key={row} className="PopupSchedule">{row}</div>)}
         </div>
@@ -66,7 +66,7 @@ function formatSchedule(schedule) {
     if (endIndex >= 0) {
       schedule = schedule.substring(0, endIndex);
     }
-    if(schedule.charAt(0) == ' ') { //no month signature
+    if(schedule.charAt(0) === ' ') { //no month signature
       const timesArray = schedule.split(';')
       return timesArray
     }
@@ -76,7 +76,7 @@ function formatSchedule(schedule) {
     }
     var newline = true;
     for (let i = 0; i < schedule.length; i++) {
-      if (schedule.charAt(i) == '/') {
+      if (schedule.charAt(i) === '/') {
         newline = !newline;
         var newMonth = formatMonth(schedule.substr(i-2, 5)) + (newline ? ';' : '')
         schedule = schedule.replaceMonth(i,  newMonth)
