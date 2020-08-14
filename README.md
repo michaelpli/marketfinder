@@ -1,68 +1,15 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+### About
+MarketFinder is a web app that helps users easily access detailed information about their local farmers markets. I love to shop at different farmers markets, but I’ve always found it difficult to figure out if a certain market will have the type of foods I’m looking for—or if it’s even currently open for the season. In addition, many people are simply unsure where to find the closest markets and are unaware of all the different products they have to offer. So, I created MarketFinder to streamline the farmers market experience and to encourage people to shop local.
 
-## Available Scripts
+### How to use
+After searching for an area you want to explore, you’ll be able to interactively visualize the closest farmers markets nearby, view details about the products they offer, and see which months they’ll be in season for. Check it out here: [MarketFinder](https://marketfinder.netlify.app)
 
-In the project directory, you can run:
+### Why Farmers Markets?
+The fruits and veggies you buy at the farmers market are the freshest available. They’re brought directly to you: no long-distance shipping, no artificial ripening, and no sitting for weeks in storage.
 
-### `npm start`
+They also contribute to protecting the environment. Food in the U.S. travels an average of 1,500 miles to get to your plate. Cutting down on this shipping saves large amounts of natural resources, lowers pollution levels, and reduces trash from excess packaging.
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Finally, shopping at farmers markets makes a big impact on family farmers. Now more than ever, small family farms have a hard time competing in the food marketplace. Buying directly from farmers gives them a better return for their produce and is a great way to support your community.
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+### Technology
+MarketFinder is built with React ([create-react-app](https://github.com/facebook/create-react-app)). Mapping capabilities are provided by [Mapbox](https://github.com/mapbox/mapbox-gl-js), and detailed farmers market data is sourced from the USDA Farmers Market Directory API. React-Bootstrap is used for styling and Netlify for hosting.
